@@ -14,30 +14,8 @@ public class InsuranceCompany : IInsuranceCompany
         AvailableRisks = availableRisks;
         _policies = policies;
     }
-
-    private void UpdateAvailableRisks(Risk newRisk)
-    {
-        if (AvailableRisks.Any(r => r.Name == newRisk.Name))
-        {
-            throw new AvailableRiskAlreadyExistsException(newRisk.Name);
-        }
-        
-        AvailableRisks.Add(newRisk);
-    }
-
-    private bool IsPolicyUniqueInGivenPeriod(string name, DateTime start, DateTime end)
-    {
-        return _policies.Count < 1 || 
-               _policies.All(p => p.NameOfInsuredObject != name) ||
-               _policies.Any(p => p.NameOfInsuredObject == name && end < p.ValidFrom || start > p.ValidTill);
-    }
-
-    private bool AreSelectedRisksValid(IEnumerable<Risk> selectedRisks)
-    {
-        return selectedRisks.All(sr => AvailableRisks.Any(ar => ar.Name == sr.Name));
-    }
-
-    public IPolicy SellPolicy(string nameOfInsuredObject, DateTime validFrom, short validMonths, IList<Risk> selectedRisks)
+    
+    private void ValidatePolicy(string nameOfInsuredObject, DateTime validFrom, short validMonths, IEnumerable<Risk> selectedRisks)
     {
         if (validFrom < DateTime.Today)
         {
@@ -49,15 +27,22 @@ public class InsuranceCompany : IInsuranceCompany
             throw new InvalidPolicyException("Minimum number of months must be 1.");
         }
 
-        if (!AreSelectedRisksValid(selectedRisks))
+        if (!selectedRisks.All(sr => AvailableRisks.Any(ar => ar.Name == sr.Name)))
         {
             throw new InvalidPolicyException($"Risks can be selected from AvailableRisks list only: {AvailableRisks}.");
         }
-        
-        if (!IsPolicyUniqueInGivenPeriod(nameOfInsuredObject, validFrom, validFrom.AddMonths(validMonths)))
+
+        if (!(_policies.Count < 1 || 
+            _policies.All(p => p.NameOfInsuredObject != nameOfInsuredObject) ||
+            _policies.Any(p => p.NameOfInsuredObject == nameOfInsuredObject && validFrom.AddMonths(validMonths) < p.ValidFrom || validFrom > p.ValidTill)))
         {
             throw new InvalidPolicyException($"A policy has already been issued for the insured object in the given period: {nameOfInsuredObject}.");
         }
+    }
+
+    public IPolicy SellPolicy(string nameOfInsuredObject, DateTime validFrom, short validMonths, IList<Risk> selectedRisks)
+    {
+        ValidatePolicy(nameOfInsuredObject, validFrom, validMonths, selectedRisks);
 
         var premium = new Premium( validFrom, validFrom.AddMonths(validMonths).AddDays(-1), selectedRisks);
         var policy = new Policy(nameOfInsuredObject, validFrom, validFrom.AddMonths(validMonths).AddDays(-1), premium.CalculateInitialPremium(), selectedRisks);
