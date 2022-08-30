@@ -44,9 +44,7 @@ public class InsuranceCompany : IInsuranceCompany
     {
         ValidatePolicy(nameOfInsuredObject, validFrom, validMonths, selectedRisks);
 
-        var premium = new Premium( validFrom, validFrom.AddMonths(validMonths).AddDays(-1), selectedRisks);
-        var policy = new Policy(nameOfInsuredObject, validFrom, validFrom.AddMonths(validMonths).AddDays(-1), premium.CalculateInitialPremium(), selectedRisks);
-        
+        var policy = new Policy(nameOfInsuredObject, validFrom, validFrom.AddMonths(validMonths).AddDays(-1), selectedRisks);
         _policies.Add(policy);
         return policy;
     }
@@ -57,15 +55,14 @@ public class InsuranceCompany : IInsuranceCompany
         {
             throw new RiskNotInsuredException(risk.Name);
         }
+        
         if (validFrom < DateTime.Today)
         {
             throw new InvalidDateException("Start date cannot be less than current date.");
         }
         
         var updatedPolicy = GetPolicy(nameOfInsuredObject, validFrom);
-        updatedPolicy.InsuredRisks.Add(risk);
-        var premium = new Premium(updatedPolicy, risk, validFrom);
-        updatedPolicy.Premium += premium.CalculateAdditionalPremium();
+        updatedPolicy.InsuredRisks.Add(new Risk(risk.Name, risk.YearlyPrice, validFrom));
     }
 
     public IPolicy GetPolicy(string nameOfInsuredObject, DateTime effectiveDate)

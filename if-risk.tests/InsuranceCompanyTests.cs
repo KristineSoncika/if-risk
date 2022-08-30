@@ -22,9 +22,9 @@ public class InsuranceCompanyTests
         };
         _policiesList = new List<Policy>
         {
-            new("Bike-1", new DateTime(2022, 06, 01), new DateTime(2022, 12, 31), 50, _availableRisksList),
-            new("Bike-2", DateTime.Today, DateTime.Today.AddMonths(6), 40, new List<Risk>{new("Fire", 3)}),
-            new("Bike-3", DateTime.Today.AddMonths(3), DateTime.Today.AddMonths(6), 35, new List<Risk>{new("Fire", 3)}  )
+            new("Bike-1", new DateTime(2022, 06, 01), new DateTime(2022, 12, 31), _availableRisksList),
+            new("Bike-2", DateTime.Today, DateTime.Today.AddMonths(6), new List<Risk>{new("Fire", 3)}),
+            new("Bike-3", DateTime.Today.AddMonths(3), DateTime.Today.AddMonths(6), new List<Risk>{new("Fire", 3)}  )
         };
         _insuranceCompany = new InsuranceCompany(_insuranceCompanyName, _availableRisksList, _policiesList);
     }
@@ -122,8 +122,8 @@ public class InsuranceCompanyTests
             new("Fire", 3),
             new("Steam leakage", 4)
         };
-        var premium = new Premium( startDate, startDate.AddMonths(months).AddDays(-1), selectedRisks);
-        var policy = new Policy(name, startDate, startDate.AddMonths(months).AddDays(-1), premium.CalculateInitialPremium(), selectedRisks);
+        // var premium = new Premium( startDate, startDate.AddMonths(months).AddDays(-1), selectedRisks);
+        var policy = new Policy(name, startDate, startDate.AddMonths(months).AddDays(-1), selectedRisks);
         
         var result = _insuranceCompany.SellPolicy(name, startDate, months, selectedRisks);
 
@@ -149,7 +149,7 @@ public class InsuranceCompanyTests
     [Fact]
     public void GetPolicy_PolicyFound_ReturnsPolicy()
     {
-        var policy = new Policy("Bike-2", DateTime.Today, DateTime.Today.AddMonths(6), 40, new List<Risk>{new("Fire", 3)});
+        var policy = new Policy("Bike-2", DateTime.Today, DateTime.Today.AddMonths(6), new List<Risk>{new("Fire", 3)});
         
         var result = _insuranceCompany.GetPolicy("Bike-2", DateTime.Today.AddDays(2));
 
@@ -191,10 +191,10 @@ public class InsuranceCompanyTests
     public void AddRisk_RiskIsInsured_AddsRisk()
     {
         var risk = new Risk("Steam leakage", 4);
-
+    
         _insuranceCompany.AddRisk("Bike-2", risk, DateTime.Today);
         var result = _insuranceCompany.GetPolicy("Bike-2", DateTime.Today.AddDays(4));
-
-        result.InsuredRisks.Should().Contain(risk);
+    
+        result.InsuredRisks.Should().Contain(new Risk(risk.Name, risk.YearlyPrice, DateTime.Today));
     }
 }
