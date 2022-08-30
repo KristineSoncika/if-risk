@@ -38,4 +38,14 @@ public class RiskTests
         risk.Name.Should().Be("Fire");
         risk.YearlyPrice.Should().Be(5);
     }
+
+    [Fact]
+    public void CreatRisk_ValidRiskWithCreationDate_CreatesRisk()
+    {
+        var risk = new Risk("Fire", 5, DateTime.Today);
+
+        risk.Name.Should().Be("Fire");
+        risk.YearlyPrice.Should().Be(5);
+        risk.StartDate.Should().Be(DateTime.Today);
+    }
 }
