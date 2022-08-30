@@ -8,7 +8,7 @@ public class Policy : IPolicy
     public string NameOfInsuredObject { get; }
     public DateTime ValidFrom { get; }
     public DateTime ValidTill { get; }
-    public decimal Premium { get; set; }
+    public decimal Premium { get; }
     public IList<Risk> InsuredRisks { get; }
 
     public Policy(string nameOfInsuredObject, DateTime validFrom, DateTime validTill, decimal premium, IList<Risk> insuredRisks)
