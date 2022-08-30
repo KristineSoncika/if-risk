@@ -6,9 +6,9 @@ namespace if_risk_tests;
 
 public class PolicyTests
 {
-    private IList<Risk> _selectedRisks;
+    private readonly IList<Risk> _selectedRisks;
 
-    private void Init()
+    public PolicyTests()
     {
         _selectedRisks = new List<Risk>
         {
@@ -60,8 +60,6 @@ public class PolicyTests
     [Fact]
     public void CreatePolicy_ValidPolicy_CreatesPolicy()
     {
-        Init();
-        
         var policy = new Policy("Bike-1", DateTime.Today, DateTime.Today.AddMonths(2), 50, _selectedRisks);
 
         policy.NameOfInsuredObject.Should().Be("Bike-1");
