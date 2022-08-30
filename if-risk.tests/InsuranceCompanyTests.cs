@@ -54,7 +54,7 @@ public class InsuranceCompanyTests
     }
     
     [Fact]
-    public void SellPolicy_PolicyNotUnique_ThrowsError()
+    public void SellPolicy_PolicyNotUnique_ThrowsInvalidPolicyException()
     {
         const string name = "Bike-1";
         var startDate = DateTime.Today;
@@ -67,7 +67,7 @@ public class InsuranceCompanyTests
     }
 
     [Fact]
-    public void SellPolicy_StartDateIsBeforeCurrentDate_ThrowsError()
+    public void SellPolicy_StartDateIsBeforeCurrentDate_ThrowsInvalidDateException()
     {
         const string name = "Bike-4";
         var startDate = new DateTime(2022, 07, 01);
@@ -80,7 +80,7 @@ public class InsuranceCompanyTests
     }
     
     [Fact]
-    public void SellPolicy_MonthsIsLessThanOne_ThrowsError()
+    public void SellPolicy_MonthsIsLessThanOne_ThrowsInvalidPolicyException()
     {
         const string name = "Bike-4";
         var startDate = DateTime.Today;
@@ -93,7 +93,7 @@ public class InsuranceCompanyTests
     }
 
     [Fact]
-    public void SellPolicy_SelectedRisksAreNotValid_ThrowsError()
+    public void SellPolicy_SelectedRisksAreNotValid_ThrowsInvalidPolicyException()
     {
         const string name = "Bike-4";
         var startDate = DateTime.Today;
@@ -131,7 +131,7 @@ public class InsuranceCompanyTests
     }
 
     [Fact]
-    public void GetPolicy_InsuredObjectNameNotFound_ThrowsError()
+    public void GetPolicy_InsuredObjectNameNotFound_ThrowsPolicyNotFoundException()
     {
         Action act = () => _insuranceCompany.GetPolicy("Bike-4", new DateTime(2022, 02, 15));
 
@@ -139,7 +139,7 @@ public class InsuranceCompanyTests
     }
     
     [Fact]
-    public void GetPolicy_EffectiveDateIsOutOfRange_ThrowsError()
+    public void GetPolicy_EffectiveDateIsOutOfRange_ThrowsPolicyNotFoundException()
     {
         Action act = () => _insuranceCompany.GetPolicy("Bike-3", DateTime.Today);
 
@@ -157,7 +157,7 @@ public class InsuranceCompanyTests
     }
 
     [Fact]
-    public void AddRisk_RiskNotInsured_ThrowsError()
+    public void AddRisk_RiskNotInsured_ThrowsRiskNotInsuredException()
     {
         var risk = new Risk("Acid rain", 10);
 
@@ -167,7 +167,7 @@ public class InsuranceCompanyTests
     }
 
     [Fact]
-    public void AddRisk_PolicyNotFound_ThrowsError()
+    public void AddRisk_PolicyNotFound_ThrowsPolicyNotFoundException()
     {
         var risk = new Risk("Fire", 10);
 
@@ -177,7 +177,7 @@ public class InsuranceCompanyTests
     }
     
     [Fact]
-    public void AddRisk_StartDateIsBeforeCurrentDate_ThrowsError()
+    public void AddRisk_StartDateIsBeforeCurrentDate_ThrowsInvalidDateException()
     {
         var risk = new Risk("Steam leakage", 4);
 
