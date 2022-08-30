@@ -18,7 +18,7 @@ public class PolicyTests
     }
     
     [Fact]
-    public void CreatePolicy_NameIsEmptyString_ThrowsError()
+    public void CreatePolicy_NameIsEmptyString_ThrowsInvalidPolicyException()
     {
         Action act = () => new Policy("", DateTime.Today, DateTime.Today.AddMonths(3), 50, _selectedRisks);
 
@@ -26,7 +26,7 @@ public class PolicyTests
     }
     
     [Fact]
-    public void CreatePolicy_NameIsNull_ThrowsError()
+    public void CreatePolicy_NameIsNull_ThrowsInvalidPolicyException()
     {
         Action act = () => new Policy(null, DateTime.Today, DateTime.Today.AddMonths(3), 50, _selectedRisks);
         
@@ -34,7 +34,7 @@ public class PolicyTests
     }
 
     [Fact]
-    public void CreatePolicy_EndDateIsLessThanStartDate_ThrowsError()
+    public void CreatePolicy_EndDateIsLessThanStartDate_ThrowsInvalidPolicyException()
     {
         Action act = () => new Policy("Bike-1", DateTime.Today, new DateTime(2022, 08, 01), 50, _selectedRisks);
         
@@ -42,7 +42,7 @@ public class PolicyTests
     }
     
     [Fact]
-    public void CreatePolicy_PremiumEqualsOrIsLessThanZero_ThrowsError()
+    public void CreatePolicy_PremiumEqualsOrIsLessThanZero_ThrowsInvalidPolicyException()
     {
         Action act = () => new Policy("Bike-1", DateTime.Today, DateTime.Today.AddMonths(2), 0, _selectedRisks);
         
@@ -50,7 +50,7 @@ public class PolicyTests
     }
     
     [Fact]
-    public void CreatePolicy_NoRisksSelected_ThrowsError()
+    public void CreatePolicy_NoRisksSelected_ThrowsInvalidPolicyException()
     {
         Action act = () => new Policy("Bike-1", DateTime.Today, DateTime.Today.AddMonths(2), 50, new List<Risk>());
         
