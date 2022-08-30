@@ -6,16 +6,16 @@ public class InsuranceCompany : IInsuranceCompany
 {
     public string Name { get; }
     public IList<Risk> AvailableRisks { get; set; }
-    public List<Policy> Policies { get; }
+    private readonly List<Policy> _policies;
 
     public InsuranceCompany(string name, IList<Risk> availableRisks, List<Policy> policies)
     {
         Name = name;
         AvailableRisks = availableRisks;
-        Policies = policies;
+        _policies = policies;
     }
 
-    public void UpdateAvailableRisks(Risk newRisk)
+    private void UpdateAvailableRisks(Risk newRisk)
     {
         if (AvailableRisks.Any(r => r.Name == newRisk.Name))
         {
@@ -25,14 +25,14 @@ public class InsuranceCompany : IInsuranceCompany
         AvailableRisks.Add(newRisk);
     }
 
-    public bool IsPolicyUniqueInGivenPeriod(string name, DateTime start, DateTime end)
+    private bool IsPolicyUniqueInGivenPeriod(string name, DateTime start, DateTime end)
     {
-        return Policies.Count < 1 || 
-               Policies.All(p => p.NameOfInsuredObject != name) ||
-               Policies.Any(p => p.NameOfInsuredObject == name && end < p.ValidFrom || start > p.ValidTill);
+        return _policies.Count < 1 || 
+               _policies.All(p => p.NameOfInsuredObject != name) ||
+               _policies.Any(p => p.NameOfInsuredObject == name && end < p.ValidFrom || start > p.ValidTill);
     }
 
-    public bool AreSelectedRisksValid(IEnumerable<Risk> selectedRisks)
+    private bool AreSelectedRisksValid(IEnumerable<Risk> selectedRisks)
     {
         return selectedRisks.All(sr => AvailableRisks.Any(ar => ar.Name == sr.Name));
     }
@@ -62,7 +62,7 @@ public class InsuranceCompany : IInsuranceCompany
         var premium = new Premium( validFrom, validFrom.AddMonths(validMonths).AddDays(-1), selectedRisks);
         var policy = new Policy(nameOfInsuredObject, validFrom, validFrom.AddMonths(validMonths).AddDays(-1), premium.CalculateInitialPremium(), selectedRisks);
         
-        Policies.Add(policy);
+        _policies.Add(policy);
         return policy;
     }
 
@@ -85,7 +85,7 @@ public class InsuranceCompany : IInsuranceCompany
 
     public IPolicy GetPolicy(string nameOfInsuredObject, DateTime effectiveDate)
     {
-        var policy = Policies.Find(p =>
+        var policy = _policies.Find(p =>
             p.NameOfInsuredObject == nameOfInsuredObject && effectiveDate >= p.ValidFrom && effectiveDate <= p.ValidTill);
 
         if (policy == null)
