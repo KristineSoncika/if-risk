@@ -13,6 +13,7 @@ public struct Risk
     /// Risk yearly price
     /// </summary>
     public decimal YearlyPrice { get; set; }
+    public DateTime StartDate { get; }
 
     public Risk(string name, decimal yearlyPrice)
     {
@@ -28,5 +29,23 @@ public struct Risk
         
         Name = name;
         YearlyPrice = yearlyPrice;
+        StartDate = default;
+    }
+    
+    public Risk(string name, decimal yearlyPrice, DateTime startDate)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            throw new InvalidRiskException("Name cannot be null or empty string.");
+        }
+        
+        if (yearlyPrice <= 0)
+        {
+            throw new InvalidRiskException("Price must be greater than 0.");
+        }
+        
+        Name = name;
+        YearlyPrice = yearlyPrice;
+        StartDate = startDate;
     }
 }

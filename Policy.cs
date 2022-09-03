@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using if_risk.Exceptions;
 
 namespace if_risk;
@@ -8,10 +7,11 @@ public class Policy : IPolicy
     public string NameOfInsuredObject { get; }
     public DateTime ValidFrom { get; }
     public DateTime ValidTill { get; }
-    public decimal Premium { get; set; }
     public IList<Risk> InsuredRisks { get; }
+    public decimal Premium => InsuredRisks.Select(r => PolicyPremium.CalculatePremium
+        (r.StartDate > ValidFrom ? r.StartDate : ValidFrom, ValidTill, r.YearlyPrice)).Sum();
 
-    public Policy(string nameOfInsuredObject, DateTime validFrom, DateTime validTill, decimal premium, IList<Risk> insuredRisks)
+    public Policy(string nameOfInsuredObject, DateTime validFrom, DateTime validTill, IList<Risk> insuredRisks)
     {
         if (string.IsNullOrEmpty(nameOfInsuredObject))
         {
@@ -23,11 +23,6 @@ public class Policy : IPolicy
             throw new InvalidPolicyException("End date must be greater start date.");
         }
 
-        if (premium <= 0)
-        {
-            throw new InvalidPolicyException("Premium must be greater than 0.");
-        }
-        
         if (insuredRisks.Count < 1)
         {
             throw new InvalidPolicyException("A minimum of one risk must be selected.");
@@ -36,7 +31,6 @@ public class Policy : IPolicy
         NameOfInsuredObject = nameOfInsuredObject;
         ValidFrom = validFrom;
         ValidTill = validTill;
-        Premium = premium;
         InsuredRisks = insuredRisks;
     }
 }

@@ -7,7 +7,7 @@ namespace if_risk_tests;
 public class RiskTests
 {
     [Fact]
-    public void CreateRisk_NameIsEmptyString_ThrowsError()
+    public void CreateRisk_NameIsEmptyString_ThrowsInvalidRiskException()
     {
         Action act = () => new Risk("", 4);
         
@@ -15,7 +15,7 @@ public class RiskTests
     }
     
     [Fact]
-    public void CreateRisk_NameIsNull_ThrowsError()
+    public void CreateRisk_NameIsNull_ThrowsInvalidRiskException()
     {
         Action act = () => new Risk(null, 4);
         
@@ -23,7 +23,7 @@ public class RiskTests
     }
     
     [Fact]
-    public void CreateRisk_PriceEqualsOrIsLessThanZero_ThrowsError()
+    public void CreateRisk_PriceEqualsOrIsLessThanZero_ThrowsInvalidRiskException()
     {
         Action act = () => new Risk("Fire", 0);
         
@@ -37,5 +37,15 @@ public class RiskTests
 
         risk.Name.Should().Be("Fire");
         risk.YearlyPrice.Should().Be(5);
+    }
+
+    [Fact]
+    public void CreatRisk_ValidRiskWithCreationDate_CreatesRisk()
+    {
+        var risk = new Risk("Fire", 5, DateTime.Today);
+
+        risk.Name.Should().Be("Fire");
+        risk.YearlyPrice.Should().Be(5);
+        risk.StartDate.Should().Be(DateTime.Today);
     }
 }

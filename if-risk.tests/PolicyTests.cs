@@ -6,9 +6,9 @@ namespace if_risk_tests;
 
 public class PolicyTests
 {
-    private IList<Risk> _selectedRisks;
+    private readonly IList<Risk> _selectedRisks;
 
-    private void Init()
+    public PolicyTests()
     {
         _selectedRisks = new List<Risk>
         {
@@ -18,56 +18,63 @@ public class PolicyTests
     }
     
     [Fact]
-    public void CreatePolicy_NameIsEmptyString_ThrowsError()
+    public void CreatePolicy_NameIsEmptyString_ThrowsInvalidPolicyException()
     {
-        Action act = () => new Policy("", DateTime.Today, DateTime.Today.AddMonths(3), 50, _selectedRisks);
+        Action act = () => 
+            new Policy("", DateTime.Today, DateTime.Today.AddMonths(3), _selectedRisks);
 
-        act.Should().Throw<InvalidPolicyException>().WithMessage("Name cannot be null or empty string.");
+        act.Should().Throw<InvalidPolicyException>()
+            .WithMessage("Name cannot be null or empty string.");
     }
     
     [Fact]
-    public void CreatePolicy_NameIsNull_ThrowsError()
+    public void CreatePolicy_NameIsNull_ThrowsInvalidPolicyException()
     {
-        Action act = () => new Policy(null, DateTime.Today, DateTime.Today.AddMonths(3), 50, _selectedRisks);
+        Action act = () => 
+            new Policy(null, DateTime.Today, DateTime.Today.AddMonths(3), _selectedRisks);
         
-        act.Should().Throw<InvalidPolicyException>().WithMessage("Name cannot be null or empty string.");
+        act.Should().Throw<InvalidPolicyException>()
+            .WithMessage("Name cannot be null or empty string.");
     }
 
     [Fact]
-    public void CreatePolicy_EndDateIsLessThanStartDate_ThrowsError()
+    public void CreatePolicy_EndDateIsLessThanStartDate_ThrowsInvalidPolicyException()
     {
-        Action act = () => new Policy("Bike-1", DateTime.Today, new DateTime(2022, 08, 01), 50, _selectedRisks);
+        Action act = () => 
+            new Policy("Bike-1", DateTime.Today, new DateTime(2022, 08, 01), _selectedRisks);
         
-        act.Should().Throw<InvalidPolicyException>().WithMessage("End date must be greater start date.");
+        act.Should().Throw<InvalidPolicyException>()
+            .WithMessage("End date must be greater start date.");
     }
-    
+
     [Fact]
-    public void CreatePolicy_PremiumEqualsOrIsLessThanZero_ThrowsError()
+    public void CreatePolicy_NoRisksSelected_ThrowsInvalidPolicyException()
     {
-        Action act = () => new Policy("Bike-1", DateTime.Today, DateTime.Today.AddMonths(2), 0, _selectedRisks);
+        Action act = () => 
+            new Policy("Bike-1", DateTime.Today, DateTime.Today.AddMonths(2), new List<Risk>());
         
-        act.Should().Throw<InvalidPolicyException>().WithMessage("Premium must be greater than 0.");
-    }
-    
-    [Fact]
-    public void CreatePolicy_NoRisksSelected_ThrowsError()
-    {
-        Action act = () => new Policy("Bike-1", DateTime.Today, DateTime.Today.AddMonths(2), 50, new List<Risk>());
-        
-        act.Should().Throw<InvalidPolicyException>().WithMessage("A minimum of one risk must be selected.");
+        act.Should().Throw<InvalidPolicyException>()
+            .WithMessage("A minimum of one risk must be selected.");
     }
     
     [Fact]
     public void CreatePolicy_ValidPolicy_CreatesPolicy()
     {
-        Init();
-        
-        var policy = new Policy("Bike-1", DateTime.Today, DateTime.Today.AddMonths(2), 50, _selectedRisks);
+        const string name = "Bike-1";
+        var start = DateTime.Today;
+        var end = DateTime.Today.AddDays(3);
+        var selectedRisks = new List<Risk>
+        {
+            new("Fire", 150),
+            new("Steam leakage", 450)
+        };
+        var policy = new Policy(name, start, end, selectedRisks);
+        var premium = policy.InsuredRisks.Select(r => PolicyPremium.CalculatePremium(start, end, r.YearlyPrice)).Sum();
 
         policy.NameOfInsuredObject.Should().Be("Bike-1");
         policy.ValidFrom.Should().Be(DateTime.Today);
-        policy.ValidTill.Should().Be(DateTime.Today.AddMonths(2));
-        policy.Premium.Should().Be(50);
-        policy.InsuredRisks.Should().Equal(_selectedRisks);
+        policy.ValidTill.Should().Be(DateTime.Today.AddDays(3));
+        policy.Premium.Should().Be(premium);
+        policy.InsuredRisks.Should().Equal(selectedRisks);
     }
 }
